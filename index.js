@@ -11,40 +11,43 @@ https://leoparada.com
 
 import fetch from 'node-fetch';
 
+let numero_ejercicios = 3;
+let cont_ejercicios   = 0
+
+let startTime = new Date();
+//console.log('Tiempo Inicio')
+//console.log(startTime)
+
 // =============================================================================================
 // PREGUNTA 1: cuántas veces aparece la letra "l" (case insensitive) en los nombres de todos
 //             los location
 // =============================================================================================
-let tiempo_1 =await ejercicio('location')
+let tiempo_1 = ejercicio('location','l')
 
 // =============================================================================================
 // PREGUNTA 2: cuántas veces aparece la letra "e" (case insensitive) en los nombres de todos
 //             los episode.
 // =============================================================================================
-let tiempo_2 = await ejercicio('episode')
+let tiempo_2 = ejercicio('episode','e')
 
 // =============================================================================================
 // PREGUNTA 3: cuántas veces aparece la letra "c" (case insensitive) en los nombres de todos 
 //             los character.
 // =============================================================================================
-let tiempo_3 = await ejercicio('character')
+let tiempo_3 = ejercicio('character','c')
 
+let array_tiempo = await []
 
-tiempo_total(tiempo_1,tiempo_2,tiempo_3)
+//tiempo_total(tiempo_1,tiempo_2,tiempo_3)
 
 // FUNCIONES ==============================================================
 
-function tiempo_total(tiempo_1,tiempo_2,tiempo_3){
-    let tiempoTotal =  (tiempo_1+tiempo_2+tiempo_3);
-    console.log(`El tiempo total es de ${tiempoTotal} milisegundos` )
-    return tiempoTotal
-}
 
+async function ejercicio(url,letra){
+    
+    let delta = [];
 
-async function ejercicio(url){
-    var startTime = new Date();  
-
-    let  url_2       = `https://rickandmortyapi.com/api/${url}`
+    let  url_2        = `https://rickandmortyapi.com/api/${url}`
     let response_2    = await fetch(url_2);
     let  data_2       = await response_2.json();
 
@@ -53,15 +56,17 @@ async function ejercicio(url){
     let aviso         = true;
 
     while(aviso){
+       
         if (data_2.info.next!==null){
             
             // ---- CREACION DEL ARRAY CON LOS NOMBRES DE LOS EPISODIOS OFRECIDOS EN LA PAGINA 1
             if (count_page==1){
                     // SE REALIZA UNA CONEXION ${count_page} API PARA OBTENER LOS DATOS DE LA SIGUIENTE PAGINA   
                     url_2       = `https://rickandmortyapi.com/api/${url}`;
+                   
                     response_2  = await fetch(url_2)
                     data_2      = await response_2.json()
-                    count_page++
+                    count_page++                  
 
             }
             else{
@@ -81,31 +86,49 @@ async function ejercicio(url){
                 data_2.results.forEach(item => {
                 array_episode.push(item.name)
                 })
+        let endTime = new Date();
+        //console.log(endTime)
+        
+        delta = endTime - startTime; // diferencia de tiempo en milisegundos
+        array_tiempo.push(delta)
+        
+        startTime = endTime;
+        //console.log(delta)
         aviso = false;   
         }
     }
 
     // -------- [2.2] CONSTRUCCION DE UN OBJETO CON ESTADISTICA PARA LETRAS --------------
-    let letra_episode  = 'e'
+    let letra_episode  = letra
     let objeto_episode = []
     // EXTRACCION DE VALORES UNICOS (ESPACIO MUESTRAL)
     let uniqueItems = [...new Set(array_episode)] // se dejan solo los valores unicos
 
     uniqueItems.forEach(item=>{      
         objeto_episode.push({ name:item, 
-                            numero_de_e:cuenta_letras(item,letra_episode)
+                            numero_veces_letra_buscada:cuenta_letras(item,letra_episode)
                             })
     })
 
     // --------------------------------------------------------------------------
     // [2.3] SE COMUNICAN LOS RESULTADOS
-    console.log(`DESARROLLANDO EJERCICIO: ${url}`)
-    console.table(objeto_episode)
 
+    cont_ejercicios++
+    
+    console.log(`DESARROLLANDO EJERCICIO: ${url}`)
+    console.log(`LETRA BUSCADA: ${letra}`)
+    console.table(objeto_episode)
+    if (numero_ejercicios == cont_ejercicios){
+        console.log('EL TIEMPO TOTAL ES: ')
+        let sum = 0;  
+        array_tiempo.forEach(element => {
+            sum = sum+element;
+        });
+        sum = sum/1000    
+        console.log(`${sum} segundos`)
+    } 
+    
 // =============================================================================================
-var endTime = new Date();
-var delta = endTime - startTime; // diferencia de tiempo en milisegundos
-//console.log(delta)
 
 return delta
 }
