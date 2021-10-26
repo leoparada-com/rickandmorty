@@ -36,7 +36,7 @@ let tiempo_2 = ejercicio('episode','e')
 // =============================================================================================
 let tiempo_3 = ejercicio('character','c')
 
-let array_tiempo = await []
+let array_tiempo = [];
 
 //tiempo_total(tiempo_1,tiempo_2,tiempo_3)
 
